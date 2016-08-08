@@ -1,40 +1,39 @@
-
 #import numpy as np
 #import matplotlib
 #import emcee
-
-
+#
+#
 #def mcmccall(params,paramrange, directory, paramfile):
-    """
-    PARAMETERS
-    ----------
-    params - numpy array
-         Parameters to be used in this call
-         to emcee.
-
-         For the purposes of ESO Halpha 569,
-         these are inclination, scale height,
-         dust mass, amax, beta, alpha, and
-         rstar.
-
-    paramrange - numpy array
-         Array defining the parameter ranges
-         to be tested in the emcee call.
-
-    directory - string
-         Directory to output all of the data for the
-         MCMC calculations.
-
-    paramfile - string
-         Parameter file to begin with.
-
-    USAGE
-    -----
-    Run emcee for a given parameter file and parameter
-    ranges.
-
-    """
-
+#    """
+#    PARAMETERS
+#    ----------
+#    params - numpy array
+#         Parameters to be used in this call
+#         to emcee.
+#
+#         For the purposes of ESO Halpha 569,
+#         these are inclination, scale height,
+#         dust mass, amax, beta, alpha, and
+#         rstar.
+#
+#    paramrange - numpy array
+#         Array defining the parameter ranges
+#         to be tested in the emcee call.
+#
+#    directory - string
+#         Directory to output all of the data for the
+#         MCMC calculations.
+#
+#    paramfile - string
+#         Parameter file to begin with.
+#
+#    USAGE
+#    -----
+#    Run emcee for a given parameter file and parameter
+#    ranges.
+#
+#    """
+#
 """
 #Below is from emcee website example
     ndim, nwalkers = 7, 100
@@ -49,7 +48,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #import emcee
 import os
-import subprocess 
+import subprocess
 #import models
 import acor
 #import utils
@@ -58,7 +57,7 @@ from mcfost.chisqr import sed_chisqr
 from mcfost.paramfiles import Paramfile
 from mcfost.models import ModelResults
 from mcfost.models import Observations
-#from mcfost import 
+#from mcfost import
 
 from emcee import PTSampler
 
@@ -66,7 +65,7 @@ import logging
 _log = logging.getLogger('mcfost')
 
 
-# Define the log likelihood 
+# Define the log likelihood
 def lnprobab(theta):
 
     """
@@ -85,7 +84,7 @@ def lnprobab(theta):
          theta[3] = max_grain_size
          theta[4] = alpha
          theta[5] = beta
-         theta[6] = weights 
+         theta[6] = weights
 
     directory - string
          Directory to output all of the data for the
@@ -111,9 +110,9 @@ def lnprobab(theta):
 
     return theta[6]*lnpimage + (1.0-theta[6])*lnpsed
 
-# Define the log Priors 
+# Define the log Priors
 def lnprior(theta):
-    
+
     inc    = theta[0]
     ho     = theta[1]
     mass   = theta[2]
@@ -121,13 +120,13 @@ def lnprior(theta):
     alpha  = theta[4]
     beta   = theta[5]
     weight = theta[6]
-    
+
     # include priors here
     if (inc < 65.0 or inc > 90.0):
-        return -np.inf    
-    
+        return -np.inf
+
     if (ho < 5.0 or ho > 25.0):
-        return -np.inf    
+        return -np.inf
 
     if (np.log10(mass) < -5.0 or np.log10(mass) > -3.0):
         return -np.inf
@@ -137,7 +136,7 @@ def lnprior(theta):
 
     if (alpha < -2.0 or alpha > 0.0):
         return -np.inf
-    
+
     if (beta < 1.0 or beta > 1.5):
         return -np.inf
 
@@ -185,9 +184,9 @@ def mcmcwrapper(theta):
     Step 2: Write new parameter files with these values.
     Step 3: Run mcfost and store images and SEDs for this file. (Switch for running seds or images separately. )
     Step 4: Calculate the chi2 values for the given model and SED.
-    Step 5: Pass the values to the log probability function. 
+    Step 5: Pass the values to the log probability function.
     """
-    # STEP 1: This is passed via theta 
+    # STEP 1: This is passed via theta
     # STEP 2:
     olddir=os.path.abspath(os.curdir)
     maindir = '/Users/swolff/Disks/mcfost-python/esoha569/'
@@ -216,7 +215,7 @@ def mcmcwrapper(theta):
     subprocess.call('mcfost '+fnstring+'.para -rt',shell=True)
     subprocess.call('mcfost '+fnstring+'.para -img 0.8 -rt',shell=True)
 
-    #STEP 4: 
+    #STEP 4:
     model = ModelResults('/Users/swolff/Disks/mcfost-python/'+fnstring)
     obs = Observations('/Users/swolff/Dropbox (GPI)/MCFOST_Testing/data')
     imagechi = image_chisqr(model,obs,wavelength=0.8)
@@ -225,16 +224,16 @@ def mcmcwrapper(theta):
     imagechi=imagechi[0]
     sedstring = 'SED {0}'.format(sedchi)+'/n'
     imagestring = 'Image {0}'.format(imagechi)
-    
+
     f = open('chisqrd.txt','w')
     f.write(sedstring)
     f.write(imagestring)
     f.close()
-    
+
     seduncertainty = obs.sed.nu_fnu_uncert
     imageuncertainty = obs.images[0.8].uncertainty
     #seduncert = np.sum(seduncertainty.value)/len(seduncertainty)
-    
+
     #imageuncert = np.sum(imageuncertainty)/len(imageuncertainty)
     # remove model image and sed
     #subprocess.call('pwd',shell=True)
@@ -248,7 +247,7 @@ def mcmcwrapper(theta):
 
 
 
-######################################################## 
+########################################################
 
 ntemps = 20
 nwalkers = 4096
@@ -290,11 +289,11 @@ for p, lnprob, lnlike in sampler.sample(p0, iterations=nburn):
 
 sampler.reset()
 
-print 'Burn in complete'
+print('Burn in complete')
 
 
 """
-#Parallelize after this step. Look into whether it's better to 
+#Parallelize after this step. Look into whether it's better to
 #vary number of walkers or number of steps across different machines.
 """
 

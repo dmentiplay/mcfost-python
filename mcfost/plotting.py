@@ -104,7 +104,7 @@ def plot_lir_lstar(parfilename=None,dir="./", inclination=0):
     print("Integrated disk flux is %.2e W m^-2" % ldisk)
 
     print("")
-    #print "L_IR / L_star  =  %.2e "   % (ldisk/lstar)
+    #print("L_IR / L_star  =  %.2e "   % (ldisk/lstar))
     print("L_IR / L_star  =  %.2e "   % ((ltot-lstar)/lstar))
 
 
@@ -180,7 +180,7 @@ def plot_image(wavelength, parfilename=None,par=None, dir="./", overplot=False, 
 
     rt_im = fits.getdata(os.path.join(dir,"data_"+wavelength,"RT.fits.gz"))
     inclin_index = utils.find_closest(par.inclinations, inclination)
-    #print "using image %s, inc=%f" % (  str(inclin_index), par['im:inclinations'][inclin_index]  )
+    #print("using image %s, inc=%f" % (  str(inclin_index), par['im:inclinations'][inclin_index]  ))
 
     #ax = plt.subplot(151)
     image = rt_im[0,0,inclin_index,:,:]
@@ -282,7 +282,7 @@ def plot_dust(directory='./', noerase=False, parameters=None):
 
 
     #if not os.path.isdir(dir):
-       #print "ERROR - invalid directory"
+       #print("ERROR - invalid directory")
 
 
     if not os.path.isfile(os.path.join(directory,'kappa.fits.gz')):

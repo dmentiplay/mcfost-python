@@ -21,7 +21,7 @@ from . import utils
 
 class ModelImageCollection(collections.Mapping):
 
-    """ 
+    """
     Helper collection class to implement on-demand loading of
     image data via a dict interface. The dict looks like it
     always contains all available images, and can be indexed via
@@ -72,7 +72,7 @@ class ModelImageCollection(collections.Mapping):
             try:
                 self.loaded_fits[canonical_wavelength].close()
             except:
-                print "Failed to close model image files."
+                print("Failed to close model image files.")
 
 
     def __len__(self):
@@ -87,7 +87,7 @@ class ModelImageCollection(collections.Mapping):
 
         if canonical_wavelength not in self._loaded_fits.keys():
             self._loaded_fits[canonical_wavelength] = fits.open( self._getpath(canonical_wavelength))[0]
-        
+
         return self._loaded_fits[canonical_wavelength]
 
 
@@ -853,7 +853,7 @@ class ObservedImage(object):
         self.mask = fits.getdata(self.mask_filename)
         self.psf = fits.getdata(self.psf_filename)
 
-    
+
 
     def __repr__(self):
         return "<Observed image at {0} microns>".format(self.wavelength)
@@ -884,13 +884,13 @@ class ObservedImage(object):
  #       raise NotImplementedError("Not implemented yet!")
 
 class OBSImageCollection(collections.Mapping):
-    """ Helper collectin class to implement on-demand loading of 
+    """ Helper collectin class to implement on-demand loading of
     image data via a dict interface. The dict looks like it
     always contains all available images, and can be indexed via
-    either floats or strings interchangably. 
+    either floats or strings interchangably.
 
     This returns a PrimaryHDU object, not a HDUlist, under the
-    assumption that MCFOST output files don't ever have more than one 
+    assumption that MCFOST output files don't ever have more than one
     extension.
 
     Most users will not need to instantiate this directly. Just
@@ -899,7 +899,7 @@ class OBSImageCollection(collections.Mapping):
     Example
     ---------
     mod = mcfostpy.ModelResults()
-    im_1_micron = mod.image_data[1.0]  # looks like array access, but is 
+    im_1_micron = mod.image_data[1.0]  # looks like array access, but is
                     # actually an automatic file read first, then access
 
     """
@@ -908,9 +908,9 @@ class OBSImageCollection(collections.Mapping):
         #self._loaded_fits = dict()
 
         self.observed_images = dict()
-        
+
         for n in observations.image_wavelengths:
-            ind = np.where(observations.file_wavelengths == n)  
+            ind = np.where(observations.file_wavelengths == n)
             file_types = observations.file_types[ind]
             filenames = observations.file_names[ind]
             for i in np.arange(len(ind[0])):
@@ -932,7 +932,7 @@ class OBSImageCollection(collections.Mapping):
         return np.asarray(self.observations.image_wavelengths, dtype=float) * units.micron
         #return self._modelresults.image_wavelengths
 
-    @property   
+    @property
     def filenames(self):
         return [self._getpath(k) for k in self.keys()]
 

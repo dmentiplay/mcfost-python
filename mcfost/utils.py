@@ -103,18 +103,18 @@ def ccm_extinction(Rv, lambda_ang):
     wavelength in Angstroms. Extinction curve A(lambda)/A(V) is returned.
     NOTE: lambda_ang is the wavelength in microns
     """
-    
+
     lambda_ang = np.asarray(lambda_ang)
-    #lambda_ang = lambda_ang*0.0001 
+    #lambda_ang = lambda_ang*0.0001
     inv_lam = 1.0/lambda_ang
-    
+
     s = len(lambda_ang)
     a = np.zeros((s))
     b = np.zeros((s)) # confirm proper syntax
 
     # Range that CCM restrict it to.
     ir = inv_lam<=1.1
-    #print 'ir',ir
+    #print('ir',ir)
     c_ir = len(ir)
     #flags = choose(greater(inv_lam,1.1),(-1,1))
 

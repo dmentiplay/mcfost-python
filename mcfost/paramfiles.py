@@ -192,8 +192,6 @@ class Paramfile(object):
         if float(self.version) >= 2.15:
             set1part('im_map_size', lineptr , 3, float)
         lineptr+=1
-        set1part('MC_n_incl',lineptr , 1, int if self.version >= 2.17 else float),
-        set1part('MC_n_az',lineptr , 2, int) ; lineptr+=1
         set1part('RT_imin', lineptr, 1, float)
         set1part('RT_imax', lineptr, 2, float)
         set1part('RT_n_incl',lineptr , 3, int)
@@ -311,11 +309,6 @@ class Paramfile(object):
 
             self.density_zones.append(density)
         lineptr+=1
-        #-- Cavity --
-        set1part('cavity_flag', lineptr, 1, str) ; lineptr+=1
-        set1part('cavity_height', lineptr, 1, float)
-        set1part('cavity_ref_radius', lineptr, 2, float) ; lineptr+=1
-        set1part('cavity_flaring_exp', lineptr, 1, float) ; lineptr+=3
 
 
         #-- Grain properties --
@@ -349,7 +342,7 @@ class Paramfile(object):
                         components.append(this_component)
                         lineptr+=1
                     dust['components']=components
-                        
+
                     # now the heating and grain size properties
                     dust_keys = ( ('heating', lineptr+0, 1, int),
                             ('amin', lineptr+1, 1, float),
@@ -359,7 +352,7 @@ class Paramfile(object):
                     for key, line, item, typ in dust_keys:
                         set1partOfDict(dust,key, line, item, typ)
                     lineptr+=3
-                    
+
 
                 else:
                     # earlier versions than 2.12, so only one component allowed.
@@ -489,6 +482,7 @@ class Paramfile(object):
         2013-04-24 Substantial code rewrites & cleanup. Updated to version 2.17
         2014-01-12 Updated to version 2.19
         2015-06-15 Updated to version 2.20
+        2016-08-08 Updated to version 3.0
 
         """
         #par = self._dict
@@ -507,7 +501,7 @@ class Paramfile(object):
         # see http://mail.scipy.org/pipermail/numpy-discussion/2013-June/066796.html
         def recarray2dict(somerecarray):
             mydict = {}
-            #print somerecarray.dtype.names
+            #print(somerecarray.dtype.names)
             for name, typecode in somerecarray.dtype.descr:
                 cast = float if 'f' in typecode else str
                 mydict[name] = cast(somerecarray[name])
@@ -518,7 +512,7 @@ class Paramfile(object):
             return "T" if somebool else "F"
 
 
-        template = """2.20                      mcfost version
+        template = """3.0                      mcfost version
 
 #Number of photon packages
   {self.nbr_photons_eq_th:<10.5g}              nbr_photons_eq_th  : T computation
@@ -537,7 +531,6 @@ class Paramfile(object):
 
 #Maps
   {self.im_nx:<3d} {self.im_ny:3d} {self.im_map_size:5.1f}        grid (nx,ny), size [AU]
-  {self.MC_n_incl} {self.MC_n_az}               MC : N_bin_incl, N_bin_az
   {self.RT_imin:<4.1f}  {self.RT_imax:<4.1f}  {self.RT_n_incl:>2d} {str_RT_centered}    RT: imin, imax, n_incl, centered ?
   {self.RT_az_min:<4.1f}  {self.RT_az_max:<4.1f}  {self.RT_n_az:>2d}    RT: az_min, az_max, n_az
   {self.distance:<6.2f}                 distance (pc)
@@ -588,7 +581,7 @@ class Paramfile(object):
 
         #getsubkeys = lambda k, l: tuple([par[k][li] for li in l])
         template += "\n#Density structure"
-        for zone in range(self.nzones): 
+        for zone in range(self.nzones):
             template+="""
   {zone[zone_type]:1d}                       zone type : 1 = disk, 2 = tapered-edge disk, 3 = envelope, 4 = debris disk, 5 = wall
   {zone[dust_mass]:<10.2e} {zone[gas_to_dust_ratio]:<5.1f}        dust mass,  gas-to-dust mass ratio
@@ -598,19 +591,12 @@ class Paramfile(object):
   {zone[surface_density_exp]:<6.3f} {zone[gamma_exp]:<6.3f}                surface density exponent (or -gamma for tappered-edge disk or volume density for envelope), usually < 0, -gamma_exp (or alpha_in & alpha_out for debris disk)
         """.format(zone = self.density_zones[zone])
 
-        template+="""
-#Cavity : everything is empty above the surface
-  {self.cavity_flag}                        cavity ?
-  {self.cavity_height:<5.1f}  {self.cavity_ref_radius:<5.1f}             height, reference radius (AU)
-  {self.cavity_flaring_exp:<5.1f}                    flaring exponent
-        """.format(self=self) #% getkeys(['cavity_flag', 'cavity_height', 'cavity_ref_radius', 'cavity_flaring_exp'])
-
         if len(self.density_zones[0]['dust']) > 1: raise NotImplemented("No support for multi dust types yet")
         template+="""
 #Grain properties"""
- 
 
-        for zone in range(self.nzones): 
+
+        for zone in range(self.nzones):
             template+="""
   {zone[dust_nspecies]:<2d}                      Number of species""".format(zone=self.density_zones[zone])
             template+="""
@@ -683,7 +669,7 @@ class Paramfile(object):
         IDL MCRE re_translationtable.txt configuration file.
 
         """
-        
+
         if paramname == 'm_star':
             self.star['mass'] = value
         elif paramname == 't_star':
